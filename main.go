@@ -16,6 +16,7 @@ type config struct {
 	next     *string
 	previous *string
 	cache    *pokecache.Cache
+	pokedex  map[string]Pokemon // stores caught Pokemon; key = pokemon name
 }
 
 // cliCommand describes one command that the REPL understands.
@@ -67,6 +68,21 @@ func getCommands() map[string]cliCommand {
 			name:        "explore",
 			description: "Explore a location area to see its Pokemon",
 			callback:    commandExplore,
+		},
+		"catch": {
+			name:        "catch",
+			description: "Attempt to catch a Pokemon",
+			callback:    commandCatch,
+		},
+		"inspect": {
+			name:        "inspect",
+			description: "Inspect a caught Pokemon's details",
+			callback:    commandInspect,
+		},
+		"pokedex": {
+			name:        "pokedex",
+			description: "List all caught Pokemon",
+			callback:    commandPokedex,
 		},
 	}
 }
@@ -120,6 +136,7 @@ func main() {
 		next:     strPtr("https://pokeapi.co/api/v2/location-area?offset=0&limit=20"),
 		previous: nil,
 		cache:    pokecache.NewCache(5 * time.Second), // 5s TTL — tune this as you like
+		pokedex:  make(map[string]Pokemon),            // make() initializes the map so writes don't panic
 	}
 	// Scanner reads user input line-by-line from stdin.
 	scanner := bufio.NewScanner(os.Stdin)
